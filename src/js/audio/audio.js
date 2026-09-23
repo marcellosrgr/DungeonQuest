@@ -1,12 +1,11 @@
-// audio.js - Web Audio API Sound Synthesizer (Zero External Assets)
+// audio.js - Web Audio API Sound Synthesizer (Enhanced for 3D Math Mage)
 class SoundSynthesizer {
     constructor() {
         this.ctx = null;
         this.isMuted = false;
-        this.masterVolume = 0.3;
+        this.masterVolume = 0.35;
         this.musicGain = null;
         this.sfxGain = null;
-        this.bgmOscs = [];
         this.bgmTimer = null;
         this.bgmStep = 0;
         this.initAudioContext();
@@ -28,7 +27,7 @@ class SoundSynthesizer {
             this.sfxGain.connect(this.masterGain);
 
             this.musicGain = this.ctx.createGain();
-            this.musicGain.gain.setValueAtTime(0.25, this.ctx.currentTime);
+            this.musicGain.gain.setValueAtTime(0.22, this.ctx.currentTime);
             this.musicGain.connect(this.masterGain);
         }
     }
@@ -47,8 +46,8 @@ class SoundSynthesizer {
         return this.isMuted;
     }
 
-    // Play Arcane Missile Spell (Laser/Whoosh tone)
-    playCastSpell(type = 'arcane') {
+    // Play Arcane Missile / Spell Cast (Laser, Fireball, Lightning, Frost)
+    playCastSpell(type = 'arcane', isCrit = false) {
         if (!this.ctx || this.isMuted) return;
         this.resume();
 
@@ -60,31 +59,52 @@ class SoundSynthesizer {
 
         if (type === 'fire') {
             osc.type = 'sawtooth';
-            osc.frequency.setValueAtTime(440, t);
-            osc.frequency.exponentialRampToValueAtTime(80, t + 0.25);
-            gain.gain.setValueAtTime(0.4, t);
+            osc.frequency.setValueAtTime(isCrit ? 580 : 440, t);
+            osc.frequency.exponentialRampToValueAtTime(70, t + 0.35);
+            gain.gain.setValueAtTime(isCrit ? 0.6 : 0.4, t);
+            gain.gain.linearRampToValueAtTime(0.01, t + 0.35);
+            osc.start(t);
+            osc.stop(t + 0.35);
+        } else if (type === 'lightning') {
+            osc.type = 'square';
+            osc.frequency.setValueAtTime(isCrit ? 1100 : 880, t);
+            osc.frequency.setValueAtTime(1400, t + 0.05);
+            osc.frequency.exponentialRampToValueAtTime(120, t + 0.25);
+            gain.gain.setValueAtTime(isCrit ? 0.5 : 0.35, t);
             gain.gain.linearRampToValueAtTime(0.01, t + 0.25);
             osc.start(t);
             osc.stop(t + 0.25);
-        } else if (type === 'lightning') {
-            osc.type = 'square';
-            osc.frequency.setValueAtTime(880, t);
-            osc.frequency.setValueAtTime(1200, t + 0.05);
-            osc.frequency.exponentialRampToValueAtTime(100, t + 0.2);
-            gain.gain.setValueAtTime(0.3, t);
-            gain.gain.linearRampToValueAtTime(0.01, t + 0.2);
-            osc.start(t);
-            osc.stop(t + 0.2);
         } else {
-            // Default arcane
+            // Arcane Nova
             osc.type = 'sine';
-            osc.frequency.setValueAtTime(320, t);
-            osc.frequency.exponentialRampToValueAtTime(880, t + 0.15);
-            gain.gain.setValueAtTime(0.35, t);
-            gain.gain.exponentialRampToValueAtTime(0.01, t + 0.18);
+            osc.frequency.setValueAtTime(isCrit ? 480 : 320, t);
+            osc.frequency.exponentialRampToValueAtTime(1020, t + 0.2);
+            gain.gain.setValueAtTime(0.4, t);
+            gain.gain.exponentialRampToValueAtTime(0.01, t + 0.22);
             osc.start(t);
-            osc.stop(t + 0.18);
+            osc.stop(t + 0.22);
         }
+
+        if (isCrit) {
+            this.playCritFanfare();
+        }
+    }
+
+    playCritFanfare() {
+        if (!this.ctx || this.isMuted) return;
+        const t = this.ctx.currentTime;
+        const osc = this.ctx.createOscillator();
+        const gain = this.ctx.createGain();
+        osc.type = 'triangle';
+        osc.frequency.setValueAtTime(1046.5, t); // C6
+        osc.frequency.setValueAtTime(1318.5, t + 0.08); // E6
+        osc.frequency.setValueAtTime(1567.98, t + 0.16); // G6
+        gain.gain.setValueAtTime(0.3, t);
+        gain.gain.exponentialRampToValueAtTime(0.01, t + 0.3);
+        osc.connect(gain);
+        gain.connect(this.sfxGain);
+        osc.start(t);
+        osc.stop(t + 0.3);
     }
 
     // Impact / Enemy Hit
@@ -97,8 +117,8 @@ class SoundSynthesizer {
         const gain = this.ctx.createGain();
 
         osc.type = 'triangle';
-        osc.frequency.setValueAtTime(150, t);
-        osc.frequency.exponentialRampToValueAtTime(40, t + 0.1);
+        osc.frequency.setValueAtTime(160, t);
+        osc.frequency.exponentialRampToValueAtTime(35, t + 0.1);
 
         gain.gain.setValueAtTime(0.4, t);
         gain.gain.linearRampToValueAtTime(0.01, t + 0.1);
@@ -116,8 +136,7 @@ class SoundSynthesizer {
         this.resume();
 
         const t = this.ctx.currentTime;
-        // White noise generator
-        const bufferSize = this.ctx.sampleRate * 0.3;
+        const bufferSize = this.ctx.sampleRate * 0.35;
         const buffer = this.ctx.createBuffer(1, bufferSize, this.ctx.sampleRate);
         const data = buffer.getChannelData(0);
         for (let i = 0; i < bufferSize; i++) {
@@ -130,26 +149,26 @@ class SoundSynthesizer {
         const filter = this.ctx.createBiquadFilter();
         filter.type = 'lowpass';
         filter.frequency.setValueAtTime(800, t);
-        filter.frequency.exponentialRampToValueAtTime(50, t + 0.3);
+        filter.frequency.exponentialRampToValueAtTime(45, t + 0.35);
 
         const gain = this.ctx.createGain();
-        gain.gain.setValueAtTime(0.5, t);
-        gain.gain.exponentialRampToValueAtTime(0.01, t + 0.3);
+        gain.gain.setValueAtTime(0.55, t);
+        gain.gain.exponentialRampToValueAtTime(0.01, t + 0.35);
 
         noise.connect(filter);
         filter.connect(gain);
         gain.connect(this.sfxGain);
 
         noise.start(t);
-        noise.stop(t + 0.3);
+        noise.stop(t + 0.35);
     }
 
-    // Correct Answer - Upward Magical Chime
+    // Correct Answer - Magical Arpeggio
     playCorrect() {
         if (!this.ctx || this.isMuted) return;
         this.resume();
 
-        const notes = [523.25, 659.25, 783.99, 1046.50]; // C5, E5, G5, C6
+        const notes = [523.25, 659.25, 783.99, 1046.50];
         const t = this.ctx.currentTime;
 
         notes.forEach((freq, idx) => {
@@ -161,14 +180,35 @@ class SoundSynthesizer {
             osc.frequency.setValueAtTime(freq, noteStart);
 
             gain.gain.setValueAtTime(0.25, noteStart);
-            gain.gain.exponentialRampToValueAtTime(0.001, noteStart + 0.2);
+            gain.gain.exponentialRampToValueAtTime(0.001, noteStart + 0.22);
 
             osc.connect(gain);
             gain.connect(this.sfxGain);
 
             osc.start(noteStart);
-            osc.stop(noteStart + 0.2);
+            osc.stop(noteStart + 0.22);
         });
+    }
+
+    // Gem Pickup sound
+    playGemPickup() {
+        if (!this.ctx || this.isMuted) return;
+        const t = this.ctx.currentTime;
+        const osc = this.ctx.createOscillator();
+        const gain = this.ctx.createGain();
+
+        osc.type = 'sine';
+        osc.frequency.setValueAtTime(880, t);
+        osc.frequency.exponentialRampToValueAtTime(1760, t + 0.08);
+
+        gain.gain.setValueAtTime(0.2, t);
+        gain.gain.linearRampToValueAtTime(0.01, t + 0.08);
+
+        osc.connect(gain);
+        gain.connect(this.sfxGain);
+
+        osc.start(t);
+        osc.stop(t + 0.08);
     }
 
     // Wrong Answer - Dissonant Downward Buzz
@@ -187,7 +227,7 @@ class SoundSynthesizer {
         osc1.frequency.setValueAtTime(140, t);
         osc1.frequency.linearRampToValueAtTime(80, t + 0.25);
 
-        osc2.frequency.setValueAtTime(133, t); // Dissonant beating
+        osc2.frequency.setValueAtTime(133, t);
         osc2.frequency.linearRampToValueAtTime(75, t + 0.25);
 
         gain.gain.setValueAtTime(0.4, t);
@@ -208,7 +248,7 @@ class SoundSynthesizer {
         if (!this.ctx || this.isMuted) return;
         this.resume();
 
-        const notes = [440, 554.37, 659.25, 880]; // A4, C#5, E5, A5
+        const notes = [440, 554.37, 659.25, 880];
         const t = this.ctx.currentTime;
 
         notes.forEach((freq, idx) => {
@@ -219,7 +259,7 @@ class SoundSynthesizer {
             osc.type = 'triangle';
             osc.frequency.setValueAtTime(freq, noteStart);
 
-            gain.gain.setValueAtTime(0.3, noteStart);
+            gain.gain.setValueAtTime(0.35, noteStart);
             gain.gain.exponentialRampToValueAtTime(0.001, noteStart + 0.4);
 
             osc.connect(gain);
@@ -253,12 +293,12 @@ class SoundSynthesizer {
         osc.stop(t + 0.15);
     }
 
-    // Procedural Synth Bassline / BGM Beat
+    // Procedural Synth Dungeon Bassline
     startBGM() {
         if (this.bgmTimer || !this.ctx) return;
         this.resume();
 
-        const bassScale = [110, 110, 130.81, 146.83, 110, 98, 123.47, 110]; // A2 bassline
+        const bassScale = [110, 110, 130.81, 146.83, 110, 98, 123.47, 110];
         this.bgmStep = 0;
 
         this.bgmTimer = setInterval(() => {
@@ -281,7 +321,7 @@ class SoundSynthesizer {
 
             osc.start(t);
             osc.stop(t + 0.22);
-        }, 260); // ~115 BPM rhythm
+        }, 250);
     }
 
     stopBGM() {

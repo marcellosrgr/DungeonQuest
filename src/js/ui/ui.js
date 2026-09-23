@@ -1,4 +1,4 @@
-// ui.js - User Interface & Input Handler
+// ui.js - User Interface & Input Handler for 3D Math Mage
 class UIManager {
     constructor() {
         // Screens
@@ -176,6 +176,8 @@ class UIManager {
     }
 
     updateHUD(player, wave, score, combo) {
+        if (!player) return;
+
         // HP
         const hpPercent = Math.max(0, Math.min(100, (player.hp / player.maxHp) * 100));
         this.hpBar.style.width = `${hpPercent}%`;
@@ -203,7 +205,6 @@ class UIManager {
         this.currentProblem = problem;
         this.answerCallback = onAnswerChosen;
 
-        // Spell icons based on spellType
         const icons = {
             'arcane': '✨',
             'fire': '🔥',

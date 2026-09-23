@@ -3,13 +3,15 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Math Mage: Dungeon Survivor - Action Roguelite Math Game</title>
-    <meta name="description" content="Kombinasi game aksi roguelite survival dan latihan matematika cepat berkecepatan tinggi dengan HTML5 Canvas dan Web Audio API.">
+    <title>Math Mage 3D: Dungeon Survivor - 3D Action Roguelite Math Game</title>
+    <meta name="description" content="Kombinasi game aksi roguelite survival 3D dan latihan matematika berkecepatan tinggi dengan Three.js, WebGL dan Web Audio API.">
     <link rel="stylesheet" href="src/css/style.css">
+    <!-- Three.js CDN -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
 </head>
 <body>
     <div id="game-container">
-        <!-- Canvas Game 2D -->
+        <!-- Three.js WebGL Canvas 3D -->
         <canvas id="gameCanvas"></canvas>
 
         <!-- In-Game HUD -->
@@ -72,8 +74,8 @@
         <!-- MENU UTAMA -->
         <div id="menu-screen" class="screen-overlay">
             <div class="menu-card glass-panel">
-                <h1 class="game-title">MATH MAGE</h1>
-                <p class="game-subtitle">Dungeon Survivor: Action Beat 'Em Up</p>
+                <h1 class="game-title">MATH MAGE 3D</h1>
+                <p class="game-subtitle">Arcane Dungeon Survivor: 3D Action Beat 'Em Up</p>
 
                 <div class="section-label">PILIH TINGKAT KESULITAN</div>
                 <div class="difficulty-group">
@@ -91,12 +93,12 @@
                     </button>
                 </div>
 
-                <button id="start-btn" class="primary-btn">MULAI BERTAHAN HIDUP</button>
+                <button id="start-btn" class="primary-btn">MULAI SURVIVAL 3D</button>
 
                 <div class="instructions-box">
-                    <strong>🎮 Kontrol:</strong> Gerak dengan <b>WASD / Tombol Arah</b> atau <b>Virtual D-Pad</b> di HP.<br>
-                    <strong>⚡ Serangan:</strong> Pilih jawaban matematika dengan <b>Klik Opsi</b> atau angka <b>[1], [2], [3], [4]</b> pada keyboard!<br>
-                    <strong>💥 Kombo:</strong> Jawaban benar beruntun memicu serangan spell area berdaya hancur tinggi!
+                    <strong>🎮 Kontrol:</strong> Gerak 3D dengan <b>WASD / Tombol Arah</b> atau <b>Virtual D-Pad</b> di HP.<br>
+                    <strong>⚡ Serangan:</strong> Pilih jawaban matematika dengan <b>Klik Opsi</b> atau angka <b>[1]-[4]</b>.<br>
+                    <strong>⏱️ Critical Cast:</strong> Jawab kilat (&lt;1.8s) untuk memicu <b>Time Slow-Mo</b> & <b>Critical Spell Damage</b>!
                 </div>
             </div>
         </div>
@@ -105,7 +107,7 @@
         <div id="game-over-screen" class="screen-overlay hidden">
             <div class="menu-card glass-panel">
                 <h1 class="game-title" style="background: linear-gradient(135deg, #ef233c, #ff70a6); -webkit-background-clip: text; -webkit-text-fill-color: transparent;">GAME OVER</h1>
-                <p class="game-subtitle">Mage kamu tumbang di dalam dungeon!</p>
+                <p class="game-subtitle">Mage kamu tumbang di dalam dungeon 3D!</p>
 
                 <div class="stats-grid">
                     <div class="stat-item">
@@ -134,7 +136,7 @@
         <div id="victory-screen" class="screen-overlay hidden">
             <div class="menu-card glass-panel">
                 <h1 class="game-title" style="background: linear-gradient(135deg, #ffd60a, #06d6a0); -webkit-background-clip: text; -webkit-text-fill-color: transparent;">VICTORY!</h1>
-                <p class="game-subtitle">Kamu berhasil menaklukkan seluruh 10 Waves!</p>
+                <p class="game-subtitle">Kamu berhasil menaklukkan seluruh 10 Waves Dungeon 3D!</p>
 
                 <div class="stats-grid">
                     <div class="stat-item">
