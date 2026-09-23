@@ -4,29 +4,40 @@ Welcome to **DungeonQuest** (`Math Mage: Dungeon Survivor`), an action roguelite
 
 ---
 
-## 🏛️ Architecture Overview
+## 🏛️ Architecture & Directory Structure
 
-The codebase is strictly written in **Pure Vanilla JavaScript (ES6+)**, **HTML5 Canvas 2D API**, and **Web Audio API** with zero external asset dependencies or paid libraries.
+The codebase is organized into a clean, modular structure under `src/`:
 
-### Key Modules:
-- `index.html`: Main canvas DOM, responsive HUD, D-Pad, and modal overlay screens (Menu, Game Over, Victory).
-- `style.css`: Modern arcane neon aesthetic, dark mode styling, glassmorphism UI, glowing effects, and responsive breakpoints.
-- `audio.js` (`SoundSynthesizer`): Web Audio API synthesis for real-time sound effects (spells, impacts, explosions, chimes, buzzers, and procedural rhythm BGM).
-- `math_engine.js` (`MathEngine`): Adaptive math question generation across 3 difficulty tiers (Basic Arithmetic, Fast Multiplication/Division, and Simple Algebra).
-- `ui.js` (`UIManager`): Screen transitions, input event listeners (`WASD`, arrow keys, hotkeys `[1]-[4]`, and touch D-Pad), HUD updates, and answer feedback.
-- `game_engine.js` (`GameEngine`): 60 FPS Canvas game loop, player movement, enemy swarm AI, spell projectiles, particles, hit flashes, and wave progression.
+```
+dungeon game/
+├── index.html                   # Game entry point, HTML5 canvas, and UI modals
+├── README.md                    # Public documentation
+├── AGENTS.md                    # Agent & developer guidelines
+└── src/
+    ├── css/
+    │   └── style.css            # Dark mode neon arcane styling & responsive layout
+    └── js/
+        ├── audio/
+        │   └── audio.js         # SoundSynthesizer (Pure Web Audio API synth)
+        ├── math/
+        │   └── math_engine.js   # MathEngine (Adaptive arithmetic/algebra generator)
+        ├── ui/
+        │   └── ui.js            # UIManager (DOM, HUD, Keyboard/Touch controls)
+        └── core/
+            └── game_engine.js   # GameEngine (60FPS Canvas loop, AI swarm, combat)
+```
 
 ---
 
 ## 🛠️ Development & Coding Standards
 
 1. **Vanilla-First**:
-   - Keep the project lightweight and framework-free unless explicitly requested.
-   - Do not add external audio files (`.mp3`, `.wav`); always use the Web Audio synthesizer in `audio.js`.
+   - Keep the project lightweight and framework-free.
+   - Do not add external audio files (`.mp3`, `.wav`); always use the Web Audio synthesizer in `src/js/audio/audio.js`.
 
 2. **Code Integrity**:
    - Write complete, robust implementations without placeholders or `// TODO` stubs.
-   - Maintain modularity across `audio.js`, `math_engine.js`, `ui.js`, and `game_engine.js`.
+   - Maintain modular separation across `audio/`, `math/`, `ui/`, and `core/`.
 
 3. **Performance & Visuals**:
    - Keep the canvas render loop optimized at 60 FPS.
@@ -39,5 +50,5 @@ The codebase is strictly written in **Pure Vanilla JavaScript (ES6+)**, **HTML5 
 
 ## 🚀 Running & Testing
 
-- Simply serve or open `index.html` in any modern web browser.
+- Simply open `index.html` in any modern web browser.
 - Git Repository: `https://github.com/marcellosrgr/DungeonQuest.git` (branch: `main`).
