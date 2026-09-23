@@ -1,0 +1,165 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Math Mage: Dungeon Survivor - Action Roguelite Math Game</title>
+    <meta name="description" content="Kombinasi game aksi roguelite survival dan latihan matematika cepat berkecepatan tinggi dengan HTML5 Canvas dan Web Audio API.">
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div id="game-container">
+        <!-- Canvas Game 2D -->
+        <canvas id="gameCanvas"></canvas>
+
+        <!-- In-Game HUD -->
+        <div id="hud-layer">
+            <!-- Top HUD: Health, Mana, Wave, Score, Audio Mute -->
+            <div class="hud-top">
+                <div class="player-status">
+                    <!-- HP Bar -->
+                    <div class="bar-container">
+                        <div id="hp-bar" class="bar-fill" style="width: 100%;"></div>
+                        <span id="hp-text" class="bar-text">100 / 100</span>
+                    </div>
+                    <!-- Mana Bar -->
+                    <div class="bar-container">
+                        <div id="mana-bar" class="bar-fill" style="width: 100%;"></div>
+                        <span id="mana-text" class="bar-text">100 / 100</span>
+                    </div>
+                </div>
+
+                <!-- Wave & Score Info -->
+                <div class="wave-score-panel">
+                    <div class="wave-badge">WAVE <span id="wave-val">1</span></div>
+                    <div class="score-text">SKOR: <span id="score-val">0</span></div>
+                </div>
+
+                <!-- Sound Controls -->
+                <div class="hud-top-right">
+                    <button id="mute-btn" class="icon-btn" title="Mute/Unmute Audio">🔊</button>
+                </div>
+            </div>
+
+            <!-- Combo Indicator -->
+            <div id="combo-container" class="combo-container">
+                <div class="combo-badge">🔥 COMBO x<span id="combo-val">0</span>!</div>
+            </div>
+
+            <!-- Math Spell Action Dock -->
+            <div class="math-spell-dock glass-panel">
+                <div class="question-box">
+                    <span id="spell-icon" class="spell-icon">✨</span>
+                    <span id="question-text" class="question-text">8 + 7</span>
+                </div>
+                <!-- 4 Spell Option Cards (Hotkey 1, 2, 3, 4) -->
+                <div id="answers-grid" class="answers-grid">
+                    <!-- Populated dynamically by ui.js -->
+                </div>
+            </div>
+
+            <!-- Mobile Virtual D-Pad -->
+            <div id="virtual-controls">
+                <div class="dpad">
+                    <button id="dpad-up" class="dpad-btn dpad-up">▲</button>
+                    <button id="dpad-left" class="dpad-btn dpad-left">◀</button>
+                    <button id="dpad-right" class="dpad-btn dpad-right">▶</button>
+                    <button id="dpad-down" class="dpad-btn dpad-down">▼</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- MENU UTAMA -->
+        <div id="menu-screen" class="screen-overlay">
+            <div class="menu-card glass-panel">
+                <h1 class="game-title">MATH MAGE</h1>
+                <p class="game-subtitle">Dungeon Survivor: Action Beat 'Em Up</p>
+
+                <div class="section-label">PILIH TINGKAT KESULITAN</div>
+                <div class="difficulty-group">
+                    <button class="diff-btn active" data-diff="basic">
+                        <div>➕ ➖</div>
+                        <div>Aritmatika Dasar</div>
+                    </button>
+                    <button class="diff-btn" data-diff="multiplication">
+                        <div>✖️ ➗</div>
+                        <div>Perkalian Cepat</div>
+                    </button>
+                    <button class="diff-btn" data-diff="algebra">
+                        <div>📐 𝓍</div>
+                        <div>Aljabar & Campuran</div>
+                    </button>
+                </div>
+
+                <button id="start-btn" class="primary-btn">MULAI BERTAHAN HIDUP</button>
+
+                <div class="instructions-box">
+                    <strong>🎮 Kontrol:</strong> Gerak dengan <b>WASD / Tombol Arah</b> atau <b>Virtual D-Pad</b> di HP.<br>
+                    <strong>⚡ Serangan:</strong> Pilih jawaban matematika dengan <b>Klik Opsi</b> atau angka <b>[1], [2], [3], [4]</b> pada keyboard!<br>
+                    <strong>💥 Kombo:</strong> Jawaban benar beruntun memicu serangan spell area berdaya hancur tinggi!
+                </div>
+            </div>
+        </div>
+
+        <!-- GAME OVER SCREEN -->
+        <div id="game-over-screen" class="screen-overlay hidden">
+            <div class="menu-card glass-panel">
+                <h1 class="game-title" style="background: linear-gradient(135deg, #ef233c, #ff70a6); -webkit-background-clip: text; -webkit-text-fill-color: transparent;">GAME OVER</h1>
+                <p class="game-subtitle">Mage kamu tumbang di dalam dungeon!</p>
+
+                <div class="stats-grid">
+                    <div class="stat-item">
+                        <div id="final-score" class="stat-val">0</div>
+                        <div class="stat-title">Total Skor</div>
+                    </div>
+                    <div class="stat-item">
+                        <div id="final-accuracy" class="stat-val">0%</div>
+                        <div class="stat-title">Akurasi Hitung</div>
+                    </div>
+                    <div class="stat-item">
+                        <div id="final-streak" class="stat-val">0x</div>
+                        <div class="stat-title">Streak Tertinggi</div>
+                    </div>
+                    <div class="stat-item">
+                        <div id="final-avg-time" class="stat-val">0s</div>
+                        <div class="stat-title">Rata-rata Respon</div>
+                    </div>
+                </div>
+
+                <button id="retry-btn" class="primary-btn">MAIN LAGI</button>
+            </div>
+        </div>
+
+        <!-- VICTORY SCREEN -->
+        <div id="victory-screen" class="screen-overlay hidden">
+            <div class="menu-card glass-panel">
+                <h1 class="game-title" style="background: linear-gradient(135deg, #ffd60a, #06d6a0); -webkit-background-clip: text; -webkit-text-fill-color: transparent;">VICTORY!</h1>
+                <p class="game-subtitle">Kamu berhasil menaklukkan seluruh 10 Waves!</p>
+
+                <div class="stats-grid">
+                    <div class="stat-item">
+                        <div id="victory-score" class="stat-val">0</div>
+                        <div class="stat-title">Skor Akhir</div>
+                    </div>
+                    <div class="stat-item">
+                        <div id="victory-accuracy" class="stat-val">100%</div>
+                        <div class="stat-title">Akurasi Matematika</div>
+                    </div>
+                    <div class="stat-item">
+                        <div id="victory-streak" class="stat-val">0x</div>
+                        <div class="stat-title">Maks Combo Streak</div>
+                    </div>
+                </div>
+
+                <button id="victory-btn" class="primary-btn">MAIN LAGI</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Scripts Module Loading -->
+    <script src="audio.js"></script>
+    <script src="math_engine.js"></script>
+    <script src="ui.js"></script>
+    <script src="game_engine.js"></script>
+</body>
+</html>
